@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="../../static/select2/css/select2.min.css"
+          th:href="@{~/select2/css/select2.min.css}"/>
+    <link rel="stylesheet" href="../../static/css/commons.css"
+          th:href="@{~/css/commons.css}"/>
+    <head th:replace="fragment/parts::head">
+    </head>
+</head>
+<body>
+<header th:replace="fragment/parts::menu">
+</header>
+<main>
+    <div class="container">
+        <h1 class="h1">Edit Profile</h1>
+
+        <div>
+            <div class="form-group">
+                <img id="doctor-picture" height="250px" style="margin-bottom: 5px; border: 1px solid black;"
+                     src="" alt=""/>
+                <br/>
+                <label class="form-control-label" for="img-1">Picture</label>
+                <input type="file" class="form-control form-control-danger" id="img-1"/>
+            </div>
+
+            <button disabled="disabled" id="update-picture-btn" class="btn btn-secondary float-right">Change Picture</button>
+            <br/>
+        </div>
+
+        <br/>
+        <hr/>
+
+        <form method="post" th:object="${editDoctorModel}">
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('firstName')} ? 'has-danger'">
+                <label class="form-control-label" for="inputFirstName">First Name</label>
+                <input type="text" class="form-control form-control-danger" id="inputFirstName"
+                       th:field="*{firstName}"/>
+                <div class="form-control-feedback" th:each="error : ${#fields.errors('firstName')}" th:text="${error}">
+                    Sorry, that First name is incorrect. Try another?
+                </div>
+            </div>
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('lastName')} ? 'has-danger'">
+                <label class="form-control-label" for="inputLastName">Last Name</label>
+                <input type="text" class="form-control form-control-danger" id="inputLastName" th:field="*{lastName}"/>
+                <div class="form-control-feedback" th:each="error : ${#fields.errors('lastName')}" th:text="${error}">
+                    Sorry, that Last name is incorrect. Try another?
+                </div>
+            </div>
+
+          
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('telephoneNumber')} ? 'has-danger'">
+                <label class="form-control-label" for="inputTelephoneNumber">Telephone Number</label>
+                <input type="tel" class="form-control form-control-danger" id="inputTelephoneNumber"
+                       th:field="*{telephoneNumber}"/>
+                <div class="form-control-feedback" th:each="error : ${#fields.errors('telephoneNumber')}"
+                     th:text="${error}">
+                    Sorry, that telephone number is incorrect.
+                </div>
+            </div>
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'has-danger'">
+                <label class="form-control-label" for="inputDateOfBirth">Date Of Birth</label>
+                <input type="date" class="form-control form-control-danger" id="inputDateOfBirth"
+                       th:field="*{dateOfBirth}" th:value="${#dates.format(#dates.createNow(), 'dd-MMM-yyyy')}"/>
+                <div class="form-control-feedback" th:each="error : ${#fields.errors('dateOfBirth')}"
+                     th:text="${error}">
+                    Sorry, that date is incorrect.
+                </div>
+            </div>
+
+        
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('startPracticeDate')} ? 'has-danger'">
+                <label class="form-control-label" for="inputStartPracticeDate">Start Practice Date</label>
+                <input type="date" class="form-control form-control-danger" id="inputStartPracticeDate"
+                       th:field="*{startPracticeDate}" value="2000-01-01"/>
+                <div class="form-control-feedback" th:each="error : ${#fields.errors('startPracticeDate')}"
+                     th:text="${error}">
+                    Sorry, that date is incorrect.
+                </div>
+            </div>
+
+        
+
+            
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('description')} ? 'has-danger'">
+                <label class="form-control-label" for="inputDescription">Description</label>
+                <textarea class="form-control form-control-danger" rows="3" id="inputDescription"
+                          th:field="*{description}"></textarea>
+                <div class="form-control-feedback" th:each="error : ${#fields.errors('description')}"
+                     th:text="${error}">
+                    Sorry, that description is incorrect.
+                </div>
+            </div>
+
+           
+
+            <input type="submit" class="btn btn-secondary clickable float-right" value="Edit Profile"/>
+        </form>
+        <br/>
+        <br/>
+    </div>
+</main>
+<div th:replace="fragment/parts::scripts">
+</div>
+<script th:src="@{~/select2/js/select2.min.js}"></script>
+<script th:src="@{~/js/util/requester.js}" src="../../static/js/util/requester.js"></script>
+<script type="text/javascript" th:inline="javascript">
+    var app = app || {};
+    var requester = requester || app.requester.load();
+
+
+    $('#update-picture-btn').click(function () {
+        updateDoctorImage();
+    });
+
+    $('#img-1').change(function () {
+        $('#update-picture-btn').removeAttr('disabled');
+    });
+
+    function updateDoctorImage() {
+        var imgFile = $('#img-1')[0].files[0];
+        if (!imgFile) {
+            return;
+        }
+
+        var data = new FormData();
+
+        data.append('img-1', imgFile);
+
+        $('#img-1').val('');
+
+        $('#update-picture-btn').attr('disabled','disabled');
+
+        $.ajax({
+            dataType: 'text',
+            url: '/doctor/edit-picture',
+            data: data,
+            type: "POST",
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false,
+            beforeSend: function (xhr) {
+//                var token = $("meta[name='_csrf']").attr("content");
+//                var header = $("meta[name='_csrf_header']").attr("content");
+//                xhr.setRequestHeader(header, token);
+            },
+            success: function (result) {
+                getDoctorImage();
+            },
+            error: function (error) {
+                //
+            }
+        });
+    }
+
+    function getDoctorImage() {
+        requester.get('/doctor/picture').then(
+            function (data) {
+                $('#doctor-picture').attr('src', data.picturePath);
+            }
+        );
+    }
+</script>
+</body>
+</html>

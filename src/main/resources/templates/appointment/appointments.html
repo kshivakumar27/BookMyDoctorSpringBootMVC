@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Appointments</title>
+    <link rel="stylesheet" href="../../static/css/commons.css"
+          th:href="@{~/css/commons.css}"/>
+</head>
+<head th:replace="fragment/parts::head">
+    <link rel="stylesheet" href="../../static/bootstrap/css/bootstrap.min.css"
+          th:href="@{~/bootstrap/css/bootstrap.min.css}"/>
+</head>
+<body>
+<header th:replace="fragment/parts::menu">
+</header>
+<main>
+    <div class="container">
+        <div class="table-wrapper">
+            <h1 class="h1">My Appointments</h1>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th sec:authorize="hasRole('ROLE_DOCTOR')">Patient</th>
+                    <th sec:authorize="hasRole('ROLE_PATIENT')">Doctor</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="appointment,iter : ${appointmentViewModels}" th:object="${appointment}">
+                    <td th:if="${param.page != null}" th:text="${param.page[0]} * 8 + ${iter.index + 1}">index</td>
+                    <td th:if="${param.page == null}" th:text="${iter.index + 1}">index</td>
+
+                    <td th:text="*{#dates.format(date, 'dd-MMM-yyyy HH:mm')}">date</td>
+                    <td th:text="*{type}">type</td>
+                    <td sec:authorize="hasRole('ROLE_DOCTOR')"
+                        th:text="*{patientBasicViewModel.firstName} + ' ' + *{patientBasicViewModel.lastName}">patient</td>
+                    <td sec:authorize="hasRole('ROLE_PATIENT')"
+                        th:text="*{doctorSelectViewModel.firstName} + ' ' + *{doctorSelectViewModel.lastName}">doctor</td>
+                    <td>
+                        <a sec:authorize="hasRole('ROLE_PATIENT')" class="btn btn-secondary" th:href="|/appointment/patient/*{id}|">View</a>
+                        <a sec:authorize="hasRole('ROLE_DOCTOR')" class="btn btn-secondary" th:href="|/appointment/doctor/*{id}|">View</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <nav aria-label="Page navigation example" th:if="!${#lists.isEmpty(appointmentViewModels)}">
+            <ul class="pagination">
+                <li class="page-item" th:classappend="!${appointmentViewModels.hasPrevious()}? 'disabled'">
+                    <a sec:authorize="hasRole('ROLE_DOCTOR')" class="page-link"
+                       th:href="${appointmentViewModels.hasPrevious()} ? '/appointment/doctor?page=' + ${appointmentViewModels.previousPageable().getPageNumber()}" >Previous</a>
+                    <a sec:authorize="hasRole('ROLE_PATIENT')" class="page-link"
+                       th:href="${appointmentViewModels.hasPrevious()} ? '/appointment/patient?page=' + ${appointmentViewModels.previousPageable().getPageNumber()}" >Previous</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, (appointmentViewModels.getTotalPages() == 0 ? 0 : appointmentViewModels.getTotalPages() - 1))}">
+                    <a sec:authorize="hasRole('ROLE_DOCTOR')" class="page-link" href="#" th:href="|/appointment/doctor?page=${i}|" th:text="${i + 1}">1</a>
+                    <a sec:authorize="hasRole('ROLE_PATIENT')" class="page-link" href="#" th:href="|/appointment/patient?page=${i}|" th:text="${i + 1}">1</a>
+                </li>
+                <li class="page-item" th:classappend="!${appointmentViewModels.hasNext()}? 'disabled'">
+                    <a sec:authorize="hasRole('ROLE_DOCTOR')" class="page-link"
+                       th:href="${appointmentViewModels.hasNext()} ? '/appointment/doctor?page=' + ${appointmentViewModels.nextPageable().getPageNumber()}">Next</a>
+                    <a sec:authorize="hasRole('ROLE_PATIENT')" class="page-link"
+                       th:href="${appointmentViewModels.hasNext()} ? '/appointment/patient?page=' + ${appointmentViewModels.nextPageable().getPageNumber()}">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</main>
+
+<div th:replace="fragment/parts::scripts">
+</div>
+</body>
+</html>

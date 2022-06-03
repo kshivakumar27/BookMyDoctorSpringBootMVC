@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Patient</title>
+    <link rel="stylesheet" href="../../static/css/commons.css"
+          th:href="@{~/css/commons.css}"/>
+</head>
+<head th:replace="fragment/parts::head">
+    <link rel="stylesheet" href="../../static/bootstrap/css/bootstrap.min.css"
+          th:href="@{~/bootstrap/css/bootstrap.min.css}"/>
+</head>
+<body>
+<header th:replace="fragment/parts::menu">
+</header>
+<main>
+    <div class="container">
+        <h1 class="h1 text-center">Patient</h1>
+
+        <div class="card">
+            <div class="card-block text-center">
+                <h4 class="card-title">
+                    <a th:text="|${patientViewModel.firstName} ${patientViewModel.lastName}|"></a>
+                </h4>
+
+                
+                <br/>
+                <small class="text-muted"
+                       th:text="|Date of birth: ${#dates.format(patientViewModel.dateOfBirth, 'dd-MMM-yyyy')}"></small>
+                <br/>
+                <small class="text-muted" th:text="|Telephone: ${patientViewModel.telephoneNumber}|">Telephone number: #
+                </small>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="fragment/parts::scripts">
+</div>
+</body>
+</html>

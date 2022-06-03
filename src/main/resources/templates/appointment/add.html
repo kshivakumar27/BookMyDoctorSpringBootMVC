@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Add Appointment</title>
+    <link rel="stylesheet" href="../../static/select2/css/select2.min.css"
+          th:href="@{~/select2/css/select2.min.css}"/>
+    <link rel="stylesheet" href="../../static/css/commons.css"
+          th:href="@{~/css/commons.css}"/>
+</head>
+<head th:replace="fragment/parts::head">
+    <link rel="stylesheet" href="../../static/bootstrap/css/bootstrap.min.css"
+          th:href="@{~/bootstrap/css/bootstrap.min.css}"/>
+</head>
+<body>
+<header th:replace="fragment/parts::menu">
+</header>
+<main>
+    <div class="container">
+        <h1 class="h1">Add Appointment</h1>
+        <br/>
+        <form method="post" th:object="${addAppointmentModel}">
+            <div class="form-group">
+                <label class="form-control-label">Appointment For</label>
+                <div>
+                    <a href="#"
+                       th:text="'Dr. ' + ${doctorSelectViewModel.firstName} + ' ' + ${doctorSelectViewModel.lastName}"></a>,
+             
+                </div>
+            </div>
+
+            <span sec:authorize="hasRole('ROLE_DOCTOR')">
+                <div class="form-group">
+                    <label class="form-control-label" for="inputPatient">For Patient</label>
+                    <select class="form-control form-control-danger" id="inputPatient" th:field="*{patient}">
+                        <option th:each="patient : ${doctorPatients}"
+                                th:value="${patient.id}"
+                                th:text="${patient.firstName} + ' ' + ${patient.lastName} + ')'"></option>
+                    </select>
+                </div>
+            </span>
+
+            <div class="form-group">
+                <label class="form-control-label" for="inputDate">Appointment Date</label>
+                <input type="text" class="form-control form-control-danger" id="inputDate" readonly="readonly"
+                       th:value="${#dates.format(addAppointmentModel.date, 'dd-MMM-yyyy HH:mm')}"/>
+            </div>
+
+           
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('description')} ? 'has-danger'">
+                <label class="form-control-label" for="inputDescription">Description</label>
+                <textarea class="form-control form-control-danger" rows="3" id="inputDescription"
+                          th:field="*{description}"></textarea>
+                <div class="form-control-feedback" th:each="error : ${#fields.errors('description')}"
+                     th:text="${error}">
+                    Sorry, that description is incorrect.
+                </div>
+            </div>
+
+            <input type="submit" class="btn btn-secondary float-right clickable" value="Add Appointment"/>
+        </form>
+        <br/>
+        <br/>
+    </div>
+</main>
+
+<div th:replace="fragment/parts::scripts">
+</div>
+<script th:src="@{~/select2/js/select2.min.js}"></script>
+
+</body>
+</html>

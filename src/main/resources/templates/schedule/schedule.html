@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <!--<meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>-->
+    <title>Schedule</title>
+    <link rel="stylesheet" href="../../static/css/commons.css"
+          th:href="@{~/css/commons.css}"/>
+    <!--<link rel="stylesheet" href="../../static/font-awesome/css/font-awesome.min.css"-->
+          <!--th:href="@{~/font-awesome/css/font-awesome.min.css}" />-->
+</head>
+<head th:replace="fragment/parts::head">
+    <link rel="stylesheet" href="../../static/bootstrap/css/bootstrap.min.css"
+          th:href="@{~/bootstrap/css/bootstrap.min.css}"/>
+</head>
+<body>
+<header th:replace="fragment/parts::menu">
+</header>
+<main>
+    <div class="container">
+        <h1 class="h1">
+            <span th:text="'Dr. ' + ${doctor.firstName} + ' ' + ${doctor.lastName}"></span> Schedule
+        </h1>
+        <div class="form-group"> <!-- float-lg-right-->
+            <input class="form-control col-md-4 push-md-8" type="week" value="2011-W33" id="week-input"/>
+            <!--<button id="refresh-btn" type="submit" class="btn btn-success">-->
+                <!--<i class="fa fa-car"></i>-->
+            <!--</button>-->
+        </div>
+        <div class="table-wrapper">
+            <table id="schedule-table" class="table">
+                <thead>
+                <tr>
+                    <th>
+                        <div>Monday</div>
+                        <div class="schedule-date">01.01</div>
+                    </th>
+                    <th>
+                        <div>Tuesday</div>
+                        <div class="schedule-date">01.01</div>
+                    </th>
+                    <th>
+                        <div>Wednesday</div>
+                        <div class="schedule-date">01.01</div>
+                    </th>
+                    <th>
+                        <div>Thursday</div>
+                        <div class="schedule-date">01.01</div>
+                    </th>
+                    <th>
+                        <div>Friday</div>
+                        <div class="schedule-date">01.01</div>
+                    </th>
+                    <th>
+                        <div>Saturday</div>
+                        <div class="schedule-date">01.01</div>
+                    </th>
+                    <th>
+                        <div>Sunday</div>
+                        <div class="schedule-date">01.01</div>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="schedule-day"></td>
+                    <td class="schedule-day"></td>
+                    <td class="schedule-day"></td>
+                    <td class="schedule-day"></td>
+                    <td class="schedule-day"></td>
+                    <td class="schedule-day"></td>
+                    <td class="schedule-day"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<span id="role-doctor" sec:authorize="hasRole('ROLE_DOCTOR')">
+</span>
+
+<div th:replace="fragment/parts::scripts">
+</div>
+<script th:src="@{~/js/util/common.js}" src="../../static/js/util/common.js"></script>
+<script th:src="@{~/js/util/requester.js}" src="../../static/js/util/requester.js"></script>
+<script th:src="@{~/js/controller/scheduleController.js}" src="../../static/js/controller/scheduleController.js"></script>
+<script th:src="@{~/js/model/appointmentModel.js}" src="../../static/js/model/appointmentModel.js"></script>
+<script th:src="@{~/js/model/weekScheduleModel.js}" src="../../static/js/model/weekScheduleModel.js"></script>
+<script th:src="@{~/js/viewBag/scheduleViewBag.js}" src="../../static/js/viewBag/scheduleViewBag.js"></script>
+<script type="text/javascript" th:inline="javascript">
+    var app = app || {};
+
+    var requester = requester || app.requester.load();
+
+    var scheduleModel = app.weekScheduleModel.load(requester);
+    var appointmentModel = app.appointmentModel.load(requester);
+    var scheduleViewBag = app.scheduleViewBag.load();
+
+    var scheduleController = app.scheduleController.load(scheduleModel, appointmentModel, scheduleViewBag);
+
+    $(document).ready(function () {
+        $('#week-input').val(app.getWeekNumberFormat());
+
+        scheduleController.updateSchedule();
+        scheduleController.loadSchedule();
+    });
+
+    $('#week-input').change(function () {
+        scheduleController.updateSchedule();
+        scheduleController.updateAppointments();
+        scheduleController.loadBookedAppointments();
+    });
+</script>
+</body>
+</html>
