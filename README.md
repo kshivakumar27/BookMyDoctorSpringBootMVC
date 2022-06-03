@@ -1,5 +1,8 @@
 # [Book My Doctor - A Clinic Appointment Management System]
 
+
+# Please go through my all projects here https://github.com/kshivakumar27
+
 ## Getting started
 ### Prerequisites:
 - Java 16
